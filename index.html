@@ -2,249 +2,1037 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#090909">
-  <title>UNKNOWN — Classified Mystery Network</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNKNOWN — Investigation Network</title>
+<meta name="theme-color" content="#080808">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg:#080808;
+  --panel:#111;
+  --panel2:#171717;
+  --red:#e32636;
+  --text:#f5f5f5;
+  --muted:#888;
+  --border:#292929;
+  --green:#60df9a;
+}
+
+* {box-sizing:border-box;margin:0;padding:0}
+body {background:var(--bg);color:var(--text);font-family:Inter,sans-serif;min-height:100vh}
+button,input,select {font:inherit}
+button {cursor:pointer}
+[hidden] {display:none!important}
+.red {color:var(--red)}
+.muted {color:var(--muted);font-size:13px;line-height:1.7}
+.eyebrow {color:var(--red);font-size:10px;font-weight:800;letter-spacing:2px;margin-bottom:12px}
+h2 {font:700 clamp(23px,3vw,34px) Orbitron,sans-serif;margin-bottom:10px}
+.background-glow {position:fixed;z-index:-1;width:700px;height:500px;top:-300px;left:30%;background:#be0f301c;filter:blur(130px);border-radius:50%;pointer-events:none}
+
+/* AUTH */
+
+.auth-screen {min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
+.auth-card {width:100%;max-width:440px;padding:38px;background:#111;border:1px solid #343434;border-radius:13px;box-shadow:0 20px 100px #000}
+.logo {text-align:center;font:800 54px Orbitron;margin-bottom:8px}
+.logo span,.brand span {color:var(--red)}
+.auth-card>.eyebrow,.auth-card>h1,.auth-card>.muted {text-align:center}
+.auth-card h1 {font:800 29px Orbitron;letter-spacing:5px;margin-bottom:10px}
+.auth-tabs {display:flex;margin:28px 0;border-bottom:1px solid var(--border)}
+.auth-tab {flex:1;background:transparent;border:0;padding:13px 5px;color:#888;font-size:11px;font-weight:800}
+.auth-tab.active {color:white;border-bottom:2px solid var(--red)}
+label {display:block;margin:17px 0 9px;color:#bbb;font-size:10px;font-weight:700;letter-spacing:1px}
+input,select {width:100%;padding:14px;border-radius:6px;border:1px solid #333;background:#090909;color:white;outline:none}
+input:focus,select:focus {border-color:var(--red);box-shadow:0 0 0 3px #e326361a}
+input::placeholder {color:#606060}
+.remember {display:flex;align-items:center;gap:9px;margin:18px 0;font-size:12px;font-weight:400;letter-spacing:0}
+.remember input {width:15px;accent-color:var(--red)}
+.primary-btn {background:var(--red);border:1px solid var(--red);color:white;padding:14px 18px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:1px;transition:.2s}
+.primary-btn:hover {background:#b71929;transform:translateY(-1px)}
+.primary-btn:disabled {opacity:.5;cursor:not-allowed}
+.full {width:100%}
+.message {color:#f16b76;font-size:12px;min-height:18px;margin-top:12px;line-height:1.6}
+.auth-footer {color:#555;text-align:center;font-size:9px;letter-spacing:2px;margin-top:24px}
+
+/* APP */
+
+.topbar {height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-bottom:1px solid var(--border);background:#0c0c0c}
+.brand {font:800 19px Orbitron;letter-spacing:2px}
+.top-right {display:flex;align-items:center;gap:10px;color:#aaa;font-size:10px;letter-spacing:1px}
+.online-dot {width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 10px var(--green)}
+.logout-btn {margin-left:15px;background:transparent;border:1px solid #393939;color:#ccc;padding:9px 13px;border-radius:5px;font-size:10px}
+.layout {display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 68px)}
+.sidebar {padding:30px 17px;background:#0b0b0b;border-right:1px solid var(--border);display:flex;flex-direction:column}
+.sidebar-label {color:#666;font-size:9px;font-weight:800;letter-spacing:2px;margin:0 0 15px 10px}
+.nav-btn {background:transparent;border:0;color:#999;padding:14px;text-align:left;border-radius:6px;margin-bottom:5px;font-size:13px}
+.nav-btn:hover,.nav-btn.active {background:#e326361a;color:white;border-left:3px solid var(--red)}
+.sidebar-bottom {margin-top:auto;padding-top:40px}
+.sidebar-bottom strong {display:block;margin:12px 10px;font-size:13px;overflow-wrap:anywhere}
+.sidebar-bottom p:not(.sidebar-label) {font-size:11px;margin:8px 10px}
+.content {max-width:1500px;width:100%;padding:42px;margin:auto}
+.view {display:none}
+.view.active {display:block;animation:appear .3s ease}
+
+/* DASHBOARD */
+
+.page-heading {display:flex;align-items:center;justify-content:space-between;gap:15px;margin:22px 0 28px}
+.status-badge {color:#f16b76;border:1px solid #4b292c;background:#e3263610;padding:10px 13px;font-size:10px;border-radius:5px}
+.hero {position:relative;overflow:hidden;min-height:255px;padding:38px;display:flex;align-items:center;border:1px solid #4b2227;border-radius:10px;background:linear-gradient(110deg,#1c090b,#100c0d 60%,#18090c)}
+.hero>div:first-child {max-width:520px;position:relative;z-index:1}
+.hero h2 {font-size:clamp(25px,4vw,38px);line-height:1.4}
+.hero p:not(.eyebrow) {color:#aaa;font-size:13px;line-height:1.8;margin:10px 0 22px}
+.hero-symbol {position:absolute;right:10%;top:-65px;color:#e3263610;font:800 300px Orbitron}
+.stats-grid {display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:25px 0 35px}
+.stat-card {background:var(--panel);border:1px solid var(--border);padding:20px;border-radius:8px}
+.stat-card p {color:#777;font-size:9px;letter-spacing:1px}
+.stat-card strong {display:block;font:700 29px Orbitron;margin:13px 0 8px}
+.stat-card small {color:var(--red);font-size:9px}
+.section-heading {display:flex;align-items:center;justify-content:space-between;margin:28px 0 13px;color:#aaa;font-size:10px;letter-spacing:1px}
+.progress-track {height:8px;background:#252525;border-radius:10px;overflow:hidden}
+.progress-fill {width:0;height:100%;background:linear-gradient(90deg,#8e111e,#ed3445);transition:width .4s}
+.activity-list {display:grid;gap:9px}
+.activity-item {display:flex;justify-content:space-between;gap:10px;padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:6px;color:#ccc;font-size:12px}
+.activity-item span:last-child {color:#777;font-size:10px}
+.terminal {background:#080808;border:1px solid #303030;border-radius:8px;margin-top:28px;padding:20px;color:var(--green);font:12px/2 monospace}
+.terminal-head {display:flex;justify-content:space-between;color:#ccc;border-bottom:1px solid #292929;padding-bottom:12px;margin-bottom:12px;font-size:10px;letter-spacing:2px}
+
+/* RIDDLES */
+
+.filter-row {display:flex;align-items:center;gap:15px;margin:25px 0}
+.filter-row select {width:auto;min-width:190px;font-size:11px}
+.riddle-grid {display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.riddle-card {background:var(--panel);border:1px solid var(--border);padding:20px;border-radius:8px;min-height:140px;text-align:left;color:white;transition:.2s}
+.riddle-card:hover {border-color:var(--red);transform:translateY(-3px)}
+.riddle-card.completed {border-color:#24553b}
+.riddle-card h3 {margin:15px 0 8px}
+.riddle-card p {color:#888;font-size:11px}
+.difficulty {display:inline-block;padding:5px 8px;border-radius:3px;background:#241315;color:#ef727c;font-size:9px;letter-spacing:1px}
+.difficulty.medium {background:#251d12;color:#e6b66a}
+.difficulty.hard {background:#211426;color:#c58be7}
+.difficulty.insane {background:#301014;color:#ff596a}
+.riddle-panel {position:relative;background:#121212;border:1px solid #4b2429;border-radius:9px;padding:30px;margin-top:25px}
+.close-btn {position:absolute;top:15px;right:15px;background:transparent;border:0;color:#999;font-size:11px}
+.timer-box {display:flex;justify-content:space-between;align-items:center;margin:25px 0;padding:15px;border:1px solid #353535;background:#090909;border-radius:6px}
+.timer-box span {color:#888;font-size:10px;letter-spacing:2px}
+.timer-box strong {color:var(--red);font:700 24px Orbitron;font-variant-numeric:tabular-nums}
+.riddle-panel h3 {font-size:19px;line-height:1.8;margin:20px 0;max-width:700px}
+.riddle-panel input {margin-bottom:12px}
+.secondary-btn {background:#191919;border:1px solid #393939;color:#ddd;padding:12px 16px;border-radius:5px;margin-top:13px;font-size:10px}
+.secondary-btn:hover {border-color:var(--red)}
+.secondary-btn:disabled {opacity:.45;cursor:not-allowed}
+.hint-text {color:#e6b66a;font-size:12px;margin-top:13px;line-height:1.6}
+.history-panel {background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:23px;margin-top:28px}
+.history-panel h3 {margin-bottom:17px}
+.history-row {display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #252525;padding:12px 0;font-size:11px}
+.history-row span:last-child {color:var(--green)}
+
+/* FILES */
+
+.files-grid {display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin:28px 0}
+.file-card {text-align:left;color:white;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:23px;transition:.2s}
+.file-card.unlocked {border-color:#4b292c}
+.file-card.unlocked:hover {border-color:var(--red)}
+.file-icon {font-size:27px}
+.file-card h3 {margin:15px 0 10px}
+.file-card p {color:#888;font-size:12px;line-height:1.7}
+.file-status {margin-top:17px;color:var(--red);font-size:10px;letter-spacing:1px;font-weight:700}
+.file-card.unlocked .file-status {color:var(--green)}
+.code-form {display:flex;gap:10px}
+
+/* PROFILE */
+
+.profile-card {max-width:650px;margin:35px auto;padding:35px;text-align:center;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+.avatar {width:85px;height:85px;display:grid;place-items:center;margin:0 auto 18px;border-radius:50%;background:#301014;border:1px solid var(--red);font:35px Orbitron}
+.profile-card h3 {font-size:21px;margin-bottom:8px;overflow-wrap:anywhere}
+.rank-badge {display:inline-block;margin-top:20px;padding:8px 15px;background:#e3263618;border:1px solid #74313a;color:#ff7882;font-size:10px;letter-spacing:2px}
+.profile-level {color:var(--red);font-size:11px;font-weight:800;margin:17px}
+.profile-stats {display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:25px 0;padding:20px 0}
+.profile-stats div {display:flex;flex-direction:column;gap:8px}
+.profile-stats strong {font:700 24px Orbitron}
+.profile-stats span {color:#777;font-size:9px;letter-spacing:1px}
+.profile-note {color:#666;font-size:10px;margin-top:30px}
+#profileTotalTime,#profileBestTime,#profileCreated {color:#aaa;font-size:12px;margin:12px 0}
+
+/* TOAST */
+
+.toast {position:fixed;right:25px;bottom:25px;max-width:calc(100% - 50px);padding:14px 20px;background:#1a1011;border:1px solid var(--red);color:white;border-radius:7px;font-size:12px;opacity:0;transform:translateY(15px);pointer-events:none;transition:.25s;z-index:50}
+.toast.show {opacity:1;transform:translateY(0)}
+@keyframes appear {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* MOBILE */
+
+@media(max-width:950px) {
+  .stats-grid {grid-template-columns:repeat(2,1fr)}
+  .riddle-grid {grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:650px) {
+  .topbar {height:60px;padding:0 12px}
+  .top-right {font-size:8px;gap:6px}
+  .logout-btn {margin-left:4px;padding:8px}
+  .layout {display:block}
+  .sidebar {position:sticky;top:0;z-index:10;flex-direction:row;overflow-x:auto;gap:4px;padding:9px;border-right:0;border-bottom:1px solid var(--border)}
+  .sidebar-label,.sidebar-bottom {display:none}
+  .nav-btn {white-space:nowrap;padding:12px;margin:0;font-size:11px}
+  .content {padding:24px 15px}
+  .hero {padding:25px}
+  .hero-symbol {right:-15%;font-size:200px}
+  .stats-grid {gap:9px}
+  .stat-card {padding:14px}
+  .stat-card strong {font-size:24px}
+  .riddle-grid,.files-grid {grid-template-columns:1fr}
+  .auth-card {padding:27px 21px}
+  .page-heading {align-items:flex-start;flex-direction:column}
+  .code-form {flex-direction:column}
+}
+@media(max-width:360px) {.stats-grid {grid-template-columns:1fr}}
+</style>
 </head>
+
 <body>
+<div class="background-glow"></div>
 
-  <div class="background-glow"></div>
+<!-- LOGIN AND SIGNUP -->
+<section id="authScreen" class="auth-screen">
+<div class="auth-card">
+  <div class="logo">U<span>.</span></div>
+  <p class="eyebrow">CLASSIFIED NETWORK / ACCESS REQUIRED</p>
+  <h1>UNKNOWN</h1>
+  <p class="muted" style="text-align:center">Every mystery has an answer. Find yours.</p>
 
-  <!-- AUTHENTICATION -->
-  <section id="authScreen" class="auth-screen">
-    <div class="auth-card">
-      <div class="logo">U<span>.</span></div>
-      <div class="eyebrow">CLASSIFIED NETWORK / ACCESS REQUIRED</div>
-      <h1>UNKNOWN</h1>
-      <p class="muted">The truth is hidden. Are you ready to find it?</p>
-
-      <div class="auth-tabs">
-        <button id="loginTab" class="auth-tab active">LOGIN</button>
-        <button id="signupTab" class="auth-tab">CREATE ACCOUNT</button>
-      </div>
-
-      <form id="authForm">
-        <label for="username">CODENAME</label>
-        <input id="username" type="text" placeholder="Enter your username"
-          minlength="3" maxlength="18" autocomplete="username" required>
-
-        <div id="passwordLabel">
-          <label for="password">PASSWORD</label>
-        </div>
-        <input id="password" type="password" placeholder="Enter your password"
-          minlength="8" autocomplete="current-password" required>
-
-        <label id="confirmLabel" for="confirmPassword" hidden>CONFIRM PASSWORD</label>
-        <input id="confirmPassword" type="password"
-          placeholder="Confirm your password" hidden autocomplete="new-password">
-
-        <label class="remember-row">
-          <input type="checkbox" id="rememberMe" checked>
-          <span>Remember me on this device</span>
-        </label>
-
-        <button type="submit" id="authSubmit" class="primary-btn">
-          ENTER THE UNKNOWN
-        </button>
-        <p id="authMessage" class="form-message" role="status"></p>
-      </form>
-
-      <div class="auth-footer">UNAUTHORIZED ACCESS IS PROHIBITED</div>
-    </div>
-  </section>
-
-  <!-- MAIN APPLICATION -->
-  <div id="appScreen" class="app-screen" hidden>
-
-    <header class="topbar">
-      <div class="brand">UNKNOWN<span>.</span></div>
-      <div class="top-right">
-        <span class="online-dot"></span>
-        <span>NETWORK ACTIVE</span>
-        <button id="logoutBtn" class="logout-btn">LOG OUT ↗</button>
-      </div>
-    </header>
-
-    <div class="layout">
-
-      <aside class="sidebar">
-        <div class="sidebar-label">MAIN MENU</div>
-
-        <button class="nav-btn active" data-view="dashboard">⌂ Dashboard</button>
-        <button class="nav-btn" data-view="riddles">◈ Riddle Room</button>
-        <button class="nav-btn" data-view="files">▤ Secret Files</button>
-        <button class="nav-btn" data-view="profile">◎ My Profile</button>
-
-        <div class="sidebar-bottom">
-          <div class="sidebar-label">YOUR STATUS</div>
-          <div id="sidebarUsername" class="side-user">PLAYER</div>
-          <div class="side-xp"><span id="sidebarXP">0</span> XP</div>
-          <div class="sidebar-warning">CLASSIFIED // 001</div>
-        </div>
-      </aside>
-
-      <main class="content">
-
-        <!-- DASHBOARD -->
-        <section class="view active" id="dashboardView">
-          <div class="page-heading">
-            <div>
-              <div class="eyebrow">PERSONAL TERMINAL / 001</div>
-              <h2>Welcome back, <span id="welcomeName">PLAYER</span>.</h2>
-              <p class="muted">Your investigation continues.</p>
-            </div>
-            <div class="status-badge">● ACTIVE AGENT</div>
-          </div>
-
-          <div class="hero-panel">
-            <div class="hero-content">
-              <div class="eyebrow">THE UNKNOWN PROJECT</div>
-              <h2>Some secrets<br>should stay buried.</h2>
-              <p>Explore classified information, solve encrypted mysteries and uncover what nobody else can see.</p>
-              <button class="primary-btn" data-go="riddles">START INVESTIGATION →</button>
-            </div>
-            <div class="hero-symbol">?</div>
-          </div>
-
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">TOTAL EXPERIENCE</div>
-              <div class="stat-number" id="dashXP">0</div>
-              <div class="stat-foot">XP EARNED</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">CURRENT LEVEL</div>
-              <div class="stat-number" id="dashLevel">1</div>
-              <div class="stat-foot">AGENT RANK</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">SOLVED RIDDLES</div>
-              <div class="stat-number" id="dashSolved">0</div>
-              <div class="stat-foot">CASES COMPLETED</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">UNLOCKED FILES</div>
-              <div class="stat-number" id="dashFiles">0</div>
-              <div class="stat-foot">DOCUMENTS FOUND</div>
-            </div>
-          </div>
-
-          <div class="section-heading">
-            <h3>INVESTIGATION PROGRESS</h3>
-            <span id="progressText">0 / 12</span>
-          </div>
-          <div class="progress-track">
-            <div id="progressBar" class="progress-fill"></div>
-          </div>
-
-          <div class="section-heading">
-            <h3>RECENT ACTIVITY</h3>
-          </div>
-          <div id="activityList" class="activity-list"></div>
-
-          <div class="terminal-panel">
-            <div class="terminal-head">UNKNOWN TERMINAL <span>●●●</span></div>
-            <p>> SYSTEM STATUS: OPERATIONAL</p>
-            <p>> INVESTIGATION: IN PROGRESS</p>
-            <p>> YOUR NEXT MOVE IS YOURS.</p>
-            <p class="terminal-cursor">_</p>
-          </div>
-        </section>
-
-        <!-- RIDDLES -->
-        <section class="view" id="riddlesView">
-          <div class="eyebrow">INTELLIGENCE DEPARTMENT / 002</div>
-          <h2>Riddle Room<span class="red">.</span></h2>
-          <p class="muted">Every answer brings you closer to the truth.</p>
-
-          <div class="filter-row">
-            <select id="difficultyFilter">
-              <option value="All">ALL DIFFICULTIES</option>
-              <option value="Easy">EASY</option>
-              <option value="Medium">MEDIUM</option>
-              <option value="Hard">HARD</option>
-              <option value="Insane">INSANE</option>
-            </select>
-            <span id="riddleCount" class="muted">12 CASES</span>
-          </div>
-
-          <div id="riddleGrid" class="riddle-grid"></div>
-
-          <div id="riddlePanel" class="riddle-panel" hidden>
-            <button id="closeRiddle" class="close-btn">✕ CLOSE</button>
-            <div id="riddleDifficulty" class="eyebrow">EASY CASE</div>
-            <div id="riddleNumber" class="muted">CASE 001</div>
-            <h3 id="riddleQuestion">Question goes here</h3>
-
-            <form id="answerForm">
-              <input id="riddleAnswer" type="text"
-                placeholder="Type your answer..." autocomplete="off" required>
-              <button class="primary-btn" type="submit">SUBMIT ANSWER →</button>
-            </form>
-
-            <button id="hintBtn" class="secondary-btn">REVEAL HINT (-15 XP)</button>
-            <p id="hintText" class="hint-text"></p>
-            <p id="answerMessage" class="form-message"></p>
-          </div>
-        </section>
-
-        <!-- SECRET FILES -->
-        <section class="view" id="filesView">
-          <div class="eyebrow">RESTRICTED DATABASE / 003</div>
-          <h2>Secret Files<span class="red">.</span></h2>
-          <p class="muted">Some documents are classified for a reason.</p>
-
-          <div id="filesGrid" class="files-grid"></div>
-
-          <div class="terminal-panel code-panel">
-            <div class="terminal-head">CLASSIFIED ACCESS TERMINAL</div>
-            <p>> HAVE YOU FOUND A SECRET ACCESS CODE?</p>
-            <form id="secretCodeForm">
-              <input id="secretCode" placeholder="ENTER SECRET CODE"
-                maxlength="30" autocomplete="off">
-              <button class="primary-btn">UNLOCK</button>
-            </form>
-            <p id="secretMessage" class="form-message"></p>
-          </div>
-        </section>
-
-        <!-- PROFILE -->
-        <section class="view" id="profileView">
-          <div class="eyebrow">AGENT INFORMATION / 004</div>
-          <h2>My Profile<span class="red">.</span></h2>
-
-          <div class="profile-card">
-            <div class="avatar" id="profileAvatar">U</div>
-            <h3 id="profileName">PLAYER</h3>
-            <p class="muted">UNKNOWN NETWORK AGENT</p>
-            <div class="profile-level">LEVEL <span id="profileLevel">1</span></div>
-
-            <div class="profile-stats">
-              <div><strong id="profileXP">0</strong><span>TOTAL XP</span></div>
-              <div><strong id="profileSolved">0</strong><span>SOLVED</span></div>
-              <div><strong id="profileFiles">0</strong><span>FILES</span></div>
-            </div>
-
-            <div class="section-heading">
-              <h3>LEVEL PROGRESS</h3>
-              <span id="profileProgressText">0 / 100 XP</span>
-            </div>
-            <div class="progress-track">
-              <div id="profileProgress" class="progress-fill"></div>
-            </div>
-
-            <p class="profile-note">Your progress is saved locally on this browser.</p>
-          </div>
-        </section>
-
-      </main>
-    </div>
+  <div class="auth-tabs">
+    <button id="loginTab" class="auth-tab active">LOGIN</button>
+    <button id="signupTab" class="auth-tab">CREATE ACCOUNT</button>
   </div>
 
-  <div id="toast" class="toast" role="status"></div>
+  <form id="authForm">
+    <label for="username">USERNAME</label>
+    <input id="username" placeholder="Your codename" minlength="3" maxlength="18" autocomplete="username" required>
 
-  <script src="script.js"></script>
+    <label for="password">PASSWORD</label>
+    <input id="password" type="password" placeholder="At least 8 characters" minlength="8" maxlength="128" required autocomplete="current-password">
+
+    <div id="confirmWrap" hidden>
+      <label for="confirmPassword">CONFIRM PASSWORD</label>
+      <input id="confirmPassword" type="password" placeholder="Repeat password" maxlength="128">
+    </div>
+
+    <label class="remember">
+      <input type="checkbox" id="rememberMe" checked>
+      Remember me
+    </label>
+
+    <button id="authSubmit" class="primary-btn full" type="submit">ENTER UNKNOWN</button>
+    <p id="authMessage" class="message" role="status"></p>
+  </form>
+  <p class="auth-footer">UNKNOWN NETWORK • ESTABLISHED 2026</p>
+</div>
+</section>
+
+<!-- MAIN APP -->
+<div id="appScreen" hidden>
+<header class="topbar">
+  <div class="brand">UNKNOWN<span>.</span></div>
+  <div class="top-right"><span class="online-dot"></span> NETWORK ACTIVE
+    <button id="logoutBtn" class="logout-btn">LOG OUT ↗</button>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+  <p class="sidebar-label">MAIN MENU</p>
+  <button class="nav-btn active" data-view="dashboard">⌂ Dashboard</button>
+  <button class="nav-btn" data-view="riddles">◈ Riddle Room</button>
+  <button class="nav-btn" data-view="files">▤ Secret Files</button>
+  <button class="nav-btn" data-view="profile">◎ My Profile</button>
+  <div class="sidebar-bottom">
+    <p class="sidebar-label">CURRENT AGENT</p>
+    <strong id="sidebarUsername">PLAYER</strong>
+    <p id="sidebarLevel">LEVEL 1</p>
+    <p id="sidebarXP" class="red">0 XP</p>
+  </div>
+</aside>
+
+<main class="content">
+
+<!-- DASHBOARD -->
+<section class="view active" id="dashboardView">
+  <p class="eyebrow">PERSONAL TERMINAL / 001</p>
+  <div class="page-heading">
+    <div><h2>Welcome, <span id="welcomeName">AGENT</span>.</h2><p class="muted">Your investigation is waiting.</p></div>
+    <span class="status-badge">● ACTIVE AGENT</span>
+  </div>
+
+  <div class="hero">
+    <div>
+      <p class="eyebrow">THE UNKNOWN PROJECT</p>
+      <h2>Find the truth.<br>Break the mystery.</h2>
+      <p>24 riddles. 10 levels. Countless secrets.</p>
+      <button class="primary-btn" data-go="riddles">START INVESTIGATION →</button>
+    </div>
+    <div class="hero-symbol">?</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><p>TOTAL XP</p><strong id="dashXP">0</strong><small>EXPERIENCE</small></div>
+    <div class="stat-card"><p>AGENT LEVEL</p><strong id="dashLevel">1</strong><small id="dashRank">RECRUIT</small></div>
+    <div class="stat-card"><p>RIDDLES SOLVED</p><strong id="dashSolved">0</strong><small>CASES COMPLETED</small></div>
+    <div class="stat-card"><p>TIME INVESTIGATED</p><strong id="dashTime">0s</strong><small>TOTAL SOLVING TIME</small></div>
+  </div>
+
+  <div class="section-heading"><h3>LEVEL PROGRESS</h3><span id="dashProgressText">0 / 100 XP</span></div>
+  <div class="progress-track"><div id="dashProgress" class="progress-fill"></div></div>
+
+  <div class="section-heading"><h3>RECENT ACTIVITY</h3></div>
+  <div id="activityList" class="activity-list"></div>
+
+  <div class="terminal">
+    <div class="terminal-head">UNKNOWN TERMINAL <span>●●●</span></div>
+    <p>> NETWORK: ONLINE</p>
+    <p>> INVESTIGATION: ACTIVE</p>
+    <p>> AGENT: AUTHORIZED</p>
+    <p>> WAITING FOR YOUR NEXT MOVE...</p>
+  </div>
+</section>
+
+<!-- RIDDLES -->
+<section class="view" id="riddlesView">
+  <p class="eyebrow">INTELLIGENCE DEPARTMENT / 002</p>
+  <h2>Riddle Room<span class="red">.</span></h2>
+  <p class="muted">Solve cases. Earn XP. Become an elite investigator.</p>
+
+  <div class="filter-row">
+    <select id="difficultyFilter">
+      <option value="All">ALL DIFFICULTIES</option>
+      <option value="Easy">EASY</option>
+      <option value="Medium">MEDIUM</option>
+      <option value="Hard">HARD</option>
+      <option value="Insane">INSANE</option>
+    </select>
+    <span id="riddleCount" class="muted">24 CASES</span>
+  </div>
+
+  <div id="riddleGrid" class="riddle-grid"></div>
+
+  <div id="riddlePanel" class="riddle-panel" hidden>
+    <button id="closeRiddle" class="close-btn">✕ CLOSE</button>
+    <p id="riddleDifficulty" class="eyebrow">EASY</p>
+    <p id="riddleNumber" class="muted">CASE 001</p>
+    <div class="timer-box"><span>TIME ELAPSED</span><strong id="riddleTimer">00:00</strong></div>
+    <h3 id="riddleQuestion"></h3>
+    <form id="answerForm">
+      <input id="riddleAnswer" placeholder="Type your answer..." autocomplete="off" required>
+      <button class="primary-btn full">SUBMIT ANSWER →</button>
+    </form>
+    <button id="hintBtn" class="secondary-btn">REVEAL HINT (-15 XP)</button>
+    <p id="hintText" class="hint-text"></p>
+    <p id="answerMessage" class="message" role="status"></p>
+  </div>
+
+  <div class="history-panel">
+    <h3>YOUR SOLVING RECORDS</h3>
+    <div id="solveHistory"></div>
+  </div>
+</section>
+
+<!-- FILES -->
+<section class="view" id="filesView">
+  <p class="eyebrow">RESTRICTED DATABASE / 003</p>
+  <h2>Secret Files<span class="red">.</span></h2>
+  <p class="muted">Earn XP to access classified documents.</p>
+  <div id="filesGrid" class="files-grid"></div>
+  <div class="terminal">
+    <div class="terminal-head">SECRET ACCESS TERMINAL</div>
+    <form id="secretCodeForm" class="code-form">
+      <input id="secretCode" placeholder="ENTER SECRET CODE" autocomplete="off">
+      <button class="primary-btn">UNLOCK</button>
+    </form>
+    <p id="secretMessage" class="message" role="status"></p>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section class="view" id="profileView">
+  <p class="eyebrow">AGENT INFORMATION / 004</p>
+  <h2>My Profile<span class="red">.</span></h2>
+  <div class="profile-card">
+    <div class="avatar" id="profileAvatar">U</div>
+    <h3 id="profileName">PLAYER</h3>
+    <p class="muted">UNKNOWN NETWORK AGENT</p>
+    <div class="rank-badge" id="profileRank">RECRUIT</div>
+    <p class="profile-level">LEVEL <span id="profileLevel">1</span></p>
+    <div class="profile-stats">
+      <div><strong id="profileXP">0</strong><span>XP</span></div>
+      <div><strong id="profileSolved">0</strong><span>SOLVED</span></div>
+      <div><strong id="profileFiles">0</strong><span>FILES</span></div>
+    </div>
+    <div class="section-heading"><h3>NEXT LEVEL</h3><span id="profileProgressText">0 / 100 XP</span></div>
+    <div class="progress-track"><div id="profileProgress" class="progress-fill"></div></div>
+    <p class="profile-note">Your progress is saved on this browser.</p>
+  </div>
+  <div class="history-panel">
+    <h3>PERSONAL RECORDS</h3>
+    <p id="profileTotalTime">Total time: 0 seconds</p>
+    <p id="profileBestTime">Fastest solve: Not yet available</p>
+    <p id="profileCreated">Account created: —</p>
+  </div>
+</section>
+
+</main>
+</div>
+</div>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+"use strict";
+
+/* ==================================
+   UNKNOWN - ACCOUNT SYSTEM
+================================== */
+
+const $ = id => document.getElementById(id);
+const DB_KEY = "unknown_accounts_v2";
+const SESSION_KEY = "unknown_session_v2";
+
+let currentUser = null;
+let account = null;
+let authMode = "login";
+let activeRiddle = null;
+let timerInterval = null;
+let startTime = null;
+let elapsedBeforePause = 0;
+let hintUsed = false;
+let toastTimeout = null;
+
+function readAccounts() {
+  try {
+    const data = JSON.parse(localStorage.getItem(DB_KEY) || "{}");
+    return data && typeof data === "object" && !Array.isArray(data) ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveAccounts(accounts) {
+  localStorage.setItem(DB_KEY, JSON.stringify(accounts));
+}
+
+function normalizeUsername(value) {
+  return value.trim().toLowerCase();
+}
+
+function showMessage(id, message) {
+  $(id).textContent = message;
+}
+
+function toast(message) {
+  const el = $("toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove("show"), 3000);
+}
+
+function saveAccount() {
+  if (!currentUser || !account) return;
+  const accounts = readAccounts();
+  accounts[currentUser] = account;
+  saveAccounts(accounts);
+}
+
+function createAccountData(username) {
+  return {
+    username,
+    xp: 0,
+    solved: [],
+    history: [],
+    activities: [],
+    bonusFiles: [],
+    created: new Date().toISOString()
+  };
+}
+
+/* Password hashing: Web Crypto on localhost or HTTPS. */
+function toHex(buffer) {
+  return Array.from(new Uint8Array(buffer))
+    .map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function hashPassword(password, salt) {
+  if (!window.crypto?.subtle) {
+    throw new Error("Password security needs HTTPS or localhost. Open this site with VS Code Live Server.");
+  }
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const bits = await crypto.subtle.deriveBits({
+    name: "PBKDF2",
+    salt: new Uint8Array(salt.match(/.{2}/g).map(x => parseInt(x,16))),
+    iterations: 150000,
+    hash: "SHA-256"
+  }, key, 256);
+  return toHex(bits);
+}
+
+function makeSalt() {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return toHex(bytes);
+}
+
+function showAuthMode(mode) {
+  authMode = mode;
+  $("loginTab").classList.toggle("active", mode === "login");
+  $("signupTab").classList.toggle("active", mode === "signup");
+  $("confirmWrap").hidden = mode !== "signup";
+  $("confirmPassword").required = mode === "signup";
+  $("authSubmit").textContent = mode === "signup" ? "CREATE ACCOUNT →" : "ENTER UNKNOWN";
+  $("password").autocomplete = mode === "signup" ? "new-password" : "current-password";
+  showMessage("authMessage", "");
+}
+
+$("loginTab").addEventListener("click", () => showAuthMode("login"));
+$("signupTab").addEventListener("click", () => showAuthMode("signup"));
+
+$("authForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const username = $("username").value.trim();
+  const key = normalizeUsername(username);
+  const password = $("password").value;
+  const confirm = $("confirmPassword").value;
+  const button = $("authSubmit");
+
+  if (!/^[a-zA-Z0-9_]{3,18}$/.test(username)) {
+    showMessage("authMessage", "Use 3–18 letters, numbers or underscores.");
+    return;
+  }
+
+  if (password.length < 8 || password.length > 128) {
+    showMessage("authMessage", "Password must be 8–128 characters.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "PLEASE WAIT...";
+
+  try {
+    const accounts = readAccounts();
+
+    if (authMode === "signup") {
+      if (accounts[key]) {
+        showMessage("authMessage", "This username already exists. Choose another.");
+        return;
+      }
+
+      if (password !== confirm) {
+        showMessage("authMessage", "Passwords do not match.");
+        return;
+      }
+
+      const salt = makeSalt();
+      const passwordHash = await hashPassword(password, salt);
+
+      accounts[key] = {
+        ...createAccountData(username),
+        salt,
+        passwordHash
+      };
+
+      saveAccounts(accounts);
+      currentUser = key;
+      account = accounts[key];
+      enterApp();
+      toast("Account created. Welcome, agent.");
+    } else {
+      const existing = accounts[key];
+
+      if (!existing) {
+        showMessage("authMessage", "Account not found. Create an account first.");
+        return;
+      }
+
+      const attemptedHash = await hashPassword(password, existing.salt);
+
+      if (attemptedHash !== existing.passwordHash) {
+        showMessage("authMessage", "Incorrect password.");
+        return;
+      }
+
+      currentUser = key;
+      account = existing;
+
+      if ($("rememberMe").checked) {
+        localStorage.setItem(SESSION_KEY, key);
+        sessionStorage.removeItem(SESSION_KEY);
+      } else {
+        sessionStorage.setItem(SESSION_KEY, key);
+        localStorage.removeItem(SESSION_KEY);
+      }
+
+      enterApp();
+      toast("Access granted. Welcome back.");
+    }
+  } catch (error) {
+    showMessage("authMessage", error.message || "Something went wrong. Please try again.");
+  } finally {
+    button.disabled = false;
+    button.textContent = authMode === "signup" ? "CREATE ACCOUNT →" : "ENTER UNKNOWN";
+  }
+});
+
+/* ==================================
+   RIDDLES
+================================== */
+
+const riddles = [
+  {id:"r01",difficulty:"Easy",xp:20,q:"What has keys but cannot open locks?",a:["piano","a piano"],hint:"It makes music."},
+  {id:"r02",difficulty:"Easy",xp:20,q:"What gets wetter the more it dries?",a:["towel","a towel"],hint:"You use it after a shower."},
+  {id:"r03",difficulty:"Easy",xp:20,q:"What has a face and two hands but no arms or legs?",a:["clock","a clock"],hint:"It tells you the time."},
+  {id:"r04",difficulty:"Easy",xp:20,q:"What has one eye but cannot see?",a:["needle","a needle"],hint:"You use it for sewing."},
+  {id:"r05",difficulty:"Easy",xp:20,q:"What goes up but never comes down?",a:["age","your age"],hint:"You get more of it every birthday."},
+  {id:"r06",difficulty:"Easy",xp:20,q:"What has many teeth but cannot bite?",a:["comb","a comb"],hint:"You use it on your hair."},
+
+  {id:"r07",difficulty:"Medium",xp:35,q:"I speak without a mouth and hear without ears. What am I?",a:["echo","an echo"],hint:"You might hear me in a mountain."},
+  {id:"r08",difficulty:"Medium",xp:35,q:"The more you take, the more you leave behind. What are they?",a:["footsteps","steps"],hint:"Think about walking."},
+  {id:"r09",difficulty:"Medium",xp:35,q:"What can travel around the world while staying in one corner?",a:["stamp","a stamp","postage stamp"],hint:"It goes on an envelope."},
+  {id:"r10",difficulty:"Medium",xp:35,q:"What has cities but no houses, forests but no trees, and water but no fish?",a:["map","a map"],hint:"You use it to find places."},
+  {id:"r11",difficulty:"Medium",xp:35,q:"What belongs to you but other people use it more than you do?",a:["your name","name"],hint:"People call you by it."},
+  {id:"r12",difficulty:"Medium",xp:35,q:"What has a neck but no head?",a:["bottle","a bottle"],hint:"You can pour water from it."},
+
+  {id:"r13",difficulty:"Hard",xp:55,q:"A man looks at a picture and says: 'Brothers and sisters I have none, but that man's father is my father's son.' Who is in the picture?",a:["his son","son"],hint:"Think about what 'my father's son' means."},
+  {id:"r14",difficulty:"Hard",xp:55,q:"What number becomes smaller when you turn it upside down?",a:["9","nine"],hint:"Look at the shape of the digit."},
+  {id:"r15",difficulty:"Hard",xp:55,q:"I am always in front of you but cannot be seen. What am I?",a:["future","the future"],hint:"It hasn't happened yet."},
+  {id:"r16",difficulty:"Hard",xp:55,q:"What five-letter word becomes shorter when you add two letters to it?",a:["short","the word short"],hint:"The answer describes length."},
+  {id:"r17",difficulty:"Hard",xp:55,q:"What disappears as soon as you say its name?",a:["silence"],hint:"It means no sound."},
+  {id:"r18",difficulty:"Hard",xp:55,q:"I have branches but no fruit, trunk or leaves. What am I?",a:["bank","a bank"],hint:"You might keep money there."},
+
+  {id:"r19",difficulty:"Insane",xp:80,q:"A person is found in a room with 53 bicycles. What happened?",a:["playing cards","card game","cards"],hint:"The number 53 is important in a deck."},
+  {id:"r20",difficulty:"Insane",xp:80,q:"What comes once in a minute, twice in a moment, but never in a thousand years?",a:["m","the letter m"],hint:"Look at the spelling of the words."},
+  {id:"r21",difficulty:"Insane",xp:80,q:"I am an odd number. Remove one letter and I become even. What am I?",a:["seven","7"],hint:"Remove the first letter of the word."},
+  {id:"r22",difficulty:"Insane",xp:80,q:"Two fathers and two sons go fishing. They catch three fish, and each gets one. How?",a:["grandfather father son","grandfather father and son","three people"],hint:"There are only three people."},
+  {id:"r23",difficulty:"Insane",xp:80,q:"What English word has three consecutive double letters?",a:["bookkeeper","bookkeeping"],hint:"It is a job-related word."},
+  {id:"r24",difficulty:"Insane",xp:80,q:"A man pushes his car to a hotel and tells the owner he is bankrupt. Why?",a:["monopoly","playing monopoly","monopoly game"],hint:"It is a board game."}
+];
+
+const levels = [
+  {level:1,xp:0,name:"RECRUIT"},
+  {level:2,xp:100,name:"DETECTIVE"},
+  {level:3,xp:250,name:"INVESTIGATOR"},
+  {level:4,xp:450,name:"ANALYST"},
+  {level:5,xp:700,name:"SPECIALIST"},
+  {level:6,xp:1000,name:"OPERATIVE"},
+  {level:7,xp:1400,name:"ELITE AGENT"},
+  {level:8,xp:1900,name:"MASTER AGENT"},
+  {level:9,xp:2500,name:"SHADOW"},
+  {level:10,xp:3300,name:"UNKNOWN LEGEND"}
+];
+
+function getLevel(xp) {
+  return [...levels].reverse().find(level => xp >= level.xp) || levels[0];
+}
+
+function nextLevel(xp) {
+  return levels.find(level => xp < level.xp) || null;
+}
+
+function formatTime(seconds) {
+  const total = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const secs = total % 60;
+  if (hours) return `${hours}h ${minutes}m ${secs}s`;
+  if (minutes) return `${minutes}m ${secs}s`;
+  return `${secs}s`;
+}
+
+function elapsedSeconds() {
+  return elapsedBeforePause + (startTime ? (Date.now() - startTime) / 1000 : 0);
+}
+
+function stopTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  if (startTime) elapsedBeforePause += (Date.now() - startTime) / 1000;
+  startTime = null;
+}
+
+function updateTimer() {
+  $("riddleTimer").textContent = formatClock(elapsedSeconds());
+}
+
+function formatClock(seconds) {
+  const total = Math.floor(seconds);
+  const minutes = Math.floor(total / 60);
+  const secs = total % 60;
+  const hours = Math.floor(minutes / 60);
+  if (hours) return `${String(hours).padStart(2,"0")}:${String(minutes%60).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+  return `${String(minutes).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
+}
+
+function startTimer() {
+  stopTimer();
+  elapsedBeforePause = 0;
+  startTime = Date.now();
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 250);
+}
+
+function addActivity(text) {
+  account.activities.unshift({text, date:Date.now()});
+  account.activities = account.activities.slice(0,8);
+}
+
+function renderRiddles() {
+  const filter = $("difficultyFilter").value;
+  const filtered = riddles.filter(r => filter === "All" || r.difficulty === filter);
+  $("riddleCount").textContent = filtered.length + " CASES";
+
+  $("riddleGrid").innerHTML = filtered.map((r,index) => {
+    const done = account.solved.includes(r.id);
+    const cls = r.difficulty.toLowerCase();
+    return `
+      <button class="riddle-card ${done ? "completed" : ""}" data-riddle="${r.id}">
+        <span class="difficulty ${cls}">${r.difficulty.toUpperCase()}</span>
+        <h3>CASE ${String(riddles.indexOf(r)+1).padStart(3,"0")}</h3>
+        <p>${done ? "✓ COMPLETED" : "XP REWARD: "+r.xp}</p>
+      </button>`;
+  }).join("");
+
+  $("riddleGrid").querySelectorAll("[data-riddle]").forEach(button => {
+    button.addEventListener("click", () => openRiddle(button.dataset.riddle));
+  });
+}
+
+function openRiddle(id) {
+  const riddle = riddles.find(r => r.id === id);
+  if (!riddle) return;
+
+  if (account.solved.includes(id)) {
+    toast("You already solved this case.");
+    return;
+  }
+
+  stopTimer();
+  activeRiddle = riddle;
+  hintUsed = false;
+  $("riddlePanel").hidden = false;
+  $("riddleDifficulty").textContent = riddle.difficulty.toUpperCase();
+  $("riddleNumber").textContent = "CASE " + String(riddles.indexOf(riddle)+1).padStart(3,"0");
+  $("riddleQuestion").textContent = riddle.q;
+  $("riddleAnswer").value = "";
+  $("hintText").textContent = "";
+  $("hintBtn").disabled = false;
+  $("answerMessage").textContent = "";
+  $("hintBtn").textContent = "REVEAL HINT (-15 XP)";
+  startTimer();
+  $("riddlePanel").scrollIntoView({behavior:"smooth",block:"start"});
+  $("riddleAnswer").focus();
+}
+
+$("closeRiddle").addEventListener("click", () => {
+  stopTimer();
+  $("riddlePanel").hidden = true;
+  activeRiddle = null;
+});
+
+$("difficultyFilter").addEventListener("change", renderRiddles);
+
+$("hintBtn").addEventListener("click", () => {
+  if (!activeRiddle || hintUsed) return;
+
+  if (account.xp < 15) {
+    showMessage("answerMessage", "You need at least 15 XP for a hint.");
+    return;
+  }
+
+  account.xp -= 15;
+  hintUsed = true;
+  $("hintText").textContent = "HINT: " + activeRiddle.hint;
+  $("hintBtn").disabled = true;
+  saveAccount();
+  renderApp();
+  toast("-15 XP. Hint revealed.");
+});
+
+$("answerForm").addEventListener("submit", event => {
+  event.preventDefault();
+  if (!activeRiddle) return;
+
+  const answer = $("riddleAnswer").value.trim().toLowerCase()
+    .replace(/[.,!?']/g,"").replace(/\s+/g," ");
+  const correct = activeRiddle.a.some(a =>
+    a.toLowerCase().replace(/[.,!?']/g,"").replace(/\s+/g," ") === answer
+  );
+
+  if (!correct) {
+    showMessage("answerMessage", "Incorrect. Think again, agent.");
+    return;
+  }
+
+  stopTimer();
+  const seconds = Math.max(1, Math.floor(elapsedBeforePause));
+  const reward = activeRiddle.xp;
+
+  const oldLevel = getLevel(account.xp).level;
+  account.xp += reward;
+  account.solved.push(activeRiddle.id);
+
+  account.history.unshift({
+    id:activeRiddle.id,
+    difficulty:activeRiddle.difficulty,
+    time:seconds,
+    xp:reward,
+    date:Date.now()
+  });
+
+  account.history = account.history.slice(0,100);
+  addActivity(`Solved case ${String(riddles.indexOf(activeRiddle)+1).padStart(3,"0")}`);
+  saveAccount();
+
+  const newLevel = getLevel(account.xp).level;
+  $("answerMessage").textContent = `CORRECT! You solved it in ${formatTime(seconds)}. +${reward} XP`;
+  $("answerMessage").style.color = "var(--green)";
+  $("riddlePanel").querySelector("form button").disabled = true;
+  $("hintBtn").disabled = true;
+
+  renderApp();
+
+  if (newLevel > oldLevel) {
+    toast("LEVEL UP! You are now " + getLevel(account.xp).name);
+  } else {
+    toast("Case solved! +" + reward + " XP");
+  }
+
+  activeRiddle = null;
+  setTimeout(() => {
+    $("riddlePanel").hidden = true;
+    $("answerForm").reset();
+    $("riddlePanel").querySelector("form button").disabled = false;
+  }, 2800);
+});
+
+function renderHistory() {
+  const history = account.history || [];
+  $("solveHistory").innerHTML = history.length ? history.slice(0,12).map(h => {
+    const r = riddles.find(r => r.id === h.id);
+    return `<div class="history-row">
+      <span>${r ? r.q : "Solved case"}<br><small>${h.difficulty}</small></span>
+      <span>${formatTime(h.time)} • +${h.xp} XP</span>
+    </div>`;
+  }).join("") : '<p class="muted">No completed cases yet. Start investigating.</p>';
+}
+
+/* ==================================
+   SECRET FILES
+================================== */
+
+const files = [
+  {id:"f1",title:"THE FIRST SIGNAL",desc:"A mysterious transmission was detected.",req:0,content:"FILE 001 — THE FIRST SIGNAL\n\nA strange signal was detected at 03:17 AM.\n\nThe message contained one word:\nUNKNOWN.\n\nNo sender was identified."},
+  {id:"f2",title:"MISSING AGENT",desc:"An agent disappeared from the network.",req:100,content:"FILE 002 — MISSING AGENT\n\nAgent 07 disappeared from the records.\n\nTheir last message said:\n'Do not trust the clock.'"},
+  {id:"f3",title:"THE RED ROOM",desc:"An unusual room appears in old records.",req:250,content:"FILE 003 — THE RED ROOM\n\nThe room appears in photographs but not in building plans.\n\nEvery photograph has the same timestamp: 11:11."},
+  {id:"f4",title:"PROJECT ZERO",desc:"A restricted investigation.",req:450,content:"FILE 004 — PROJECT ZERO\n\nThe first UNKNOWN experiment was launched years ago.\n\nIts purpose remains classified."},
+  {id:"f5",title:"THE FINAL MESSAGE",desc:"A message hidden in the system.",req:700,content:"FILE 005 — THE FINAL MESSAGE\n\nYou found this file because you kept investigating.\n\nThe system has been waiting for someone like you."},
+  {id:"f6",title:"THE UNKNOWN LEGEND",desc:"The highest-level classified record.",req:3300,content:"FILE 006 — THE UNKNOWN LEGEND\n\nYou reached the highest rank.\n\nThe greatest mystery was never the system.\n\nIt was how far you could go."}
+];
+
+function hasFile(file) {
+  return account.bonusFiles.includes(file.id) || account.xp >= file.req;
+}
+
+function renderFiles() {
+  $("filesGrid").innerHTML = files.map(file => {
+    const unlocked = hasFile(file);
+    return `<button class="file-card ${unlocked ? "unlocked" : ""}" data-file="${file.id}">
+      <div class="file-icon">${unlocked ? "▤" : "🔒"}</div>
+      <h3>${file.title}</h3>
+      <p>${file.desc}</p>
+      <div class="file-status">${unlocked ? "● ACCESS GRANTED — OPEN" : "LOCKED — REQUIRES "+file.req+" XP"}</div>
+    </button>`;
+  }).join("");
+
+  $("filesGrid").querySelectorAll("[data-file]").forEach(button => {
+    button.addEventListener("click", () => {
+      const file = files.find(f => f.id === button.dataset.file);
+      if (!hasFile(file)) {
+        toast("You need more XP to unlock this file.");
+        return;
+      }
+      alert(file.content);
+    });
+  });
+}
+
+$("secretCodeForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const code = $("secretCode").value.trim().toUpperCase();
+
+  if (code === "REDACTED") {
+    if (account.usedCodes?.includes(code)) {
+      showMessage("secretMessage","You already used this code.");
+    } else {
+      account.usedCodes ||= [];
+      account.usedCodes.push(code);
+      account.xp += 30;
+      addActivity("Found a hidden XP code");
+      saveAccount();
+      showMessage("secretMessage","CODE ACCEPTED! +30 XP");
+      renderApp();
+    }
+  } else if (code === "OPENUNKNOWN") {
+    if (account.bonusFiles.includes("f6")) {
+      showMessage("secretMessage","This secret file is already unlocked.");
+    } else {
+      account.bonusFiles.push("f6");
+      addActivity("Unlocked a secret file");
+      saveAccount();
+      showMessage("secretMessage","SECRET FILE UNLOCKED!");
+      renderApp();
+    }
+  } else {
+    showMessage("secretMessage","INVALID CODE. ACCESS DENIED.");
+  }
+
+  $("secretCode").value = "";
+});
+
+/* ==================================
+   DASHBOARD AND PROFILE
+================================== */
+
+function renderApp() {
+  const level = getLevel(account.xp);
+  const next = nextLevel(account.xp);
+  const progress = next
+    ? ((account.xp - level.xp) / (next.xp - level.xp)) * 100
+    : 100;
+  const progressText = next
+    ? `${account.xp - level.xp} / ${next.xp - level.xp} XP`
+    : "MAX LEVEL REACHED";
+
+  const totalTime = account.history.reduce((sum,h) => sum+h.time,0);
+  const best = account.history.length
+    ? Math.min(...account.history.map(h => h.time))
+    : null;
+
+  $("welcomeName").textContent = account.username;
+  $("sidebarUsername").textContent = account.username;
+  $("sidebarLevel").textContent = "LEVEL " + level.level;
+  $("sidebarXP").textContent = account.xp + " XP";
+
+  $("dashXP").textContent = account.xp;
+  $("dashLevel").textContent = level.level;
+  $("dashRank").textContent = level.name;
+  $("dashSolved").textContent = account.solved.length;
+  $("dashTime").textContent = formatTime(totalTime);
+  $("dashProgress").style.width = progress + "%";
+  $("dashProgressText").textContent = progressText;
+
+  $("profileAvatar").textContent = account.username[0].toUpperCase();
+  $("profileName").textContent = account.username;
+  $("profileRank").textContent = level.name;
+  $("profileLevel").textContent = level.level;
+  $("profileXP").textContent = account.xp;
+  $("profileSolved").textContent = account.solved.length;
+  $("profileFiles").textContent = files.filter(hasFile).length;
+  $("profileProgress").style.width = progress + "%";
+  $("profileProgressText").textContent = progressText;
+  $("profileTotalTime").textContent = "Total solving time: " + formatTime(totalTime);
+  $("profileBestTime").textContent = "Fastest solve: " + (best === null ? "Not yet available" : formatTime(best));
+  $("profileCreated").textContent = "Account created: " + new Date(account.created).toLocaleDateString();
+
+  $("activityList").innerHTML = account.activities.length
+    ? account.activities.slice(0,6).map(a =>
+      `<div class="activity-item"><span>${a.text}</span><span>${new Date(a.date).toLocaleDateString()}</span></div>`
+    ).join("")
+    : '<p class="muted">No activity yet. Your first case is waiting.</p>';
+
+  renderRiddles();
+  renderFiles();
+  renderHistory();
+}
+
+/* ==================================
+   NAVIGATION AND LOGIN SESSION
+================================== */
+
+function enterApp() {
+  $("authScreen").hidden = true;
+  $("appScreen").hidden = false;
+
+  if ($("rememberMe").checked && !localStorage.getItem(SESSION_KEY)) {
+    localStorage.setItem(SESSION_KEY,currentUser);
+  }
+
+  renderApp();
+}
+
+function showView(name) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active",b.dataset.view === name));
+  $(name + "View").classList.add("active");
+  stopTimer();
+  if (activeRiddle) {
+    $("riddlePanel").hidden = true;
+    activeRiddle = null;
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll(".nav-btn").forEach(button => {
+  button.addEventListener("click",() => showView(button.dataset.view));
+});
+
+document.querySelectorAll("[data-go]").forEach(button => {
+  button.addEventListener("click",() => showView(button.dataset.go));
+});
+
+$("logoutBtn").addEventListener("click",() => {
+  stopTimer();
+  localStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
+  currentUser = null;
+  account = null;
+  $("appScreen").hidden = true;
+  $("authScreen").hidden = false;
+  $("authForm").reset();
+  showAuthMode("login");
+  toast("Logged out successfully.");
+});
+
+/* Restore saved login */
+function restoreSession() {
+  const key = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
+  if (!key) return;
+
+  const accounts = readAccounts();
+  if (!accounts[key]) {
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+    return;
+  }
+
+  currentUser = key;
+  account = accounts[key];
+
+  account.solved ||= [];
+  account.history ||= [];
+  account.activities ||= [];
+  account.bonusFiles ||= [];
+
+  enterApp();
+}
+
+try {
+  restoreSession();
+} catch (error) {
+  showMessage("authMessage","Browser storage is unavailable. Please allow site storage.");
+}
+</script>
 </body>
 </html>
