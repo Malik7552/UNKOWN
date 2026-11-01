@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090909">
+  <title>UNKNOWN — Classified Mystery Network</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="background-glow"></div>
+
+  <!-- AUTHENTICATION -->
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="logo">U<span>.</span></div>
+      <div class="eyebrow">CLASSIFIED NETWORK / ACCESS REQUIRED</div>
+      <h1>UNKNOWN</h1>
+      <p class="muted">The truth is hidden. Are you ready to find it?</p>
+
+      <div class="auth-tabs">
+        <button id="loginTab" class="auth-tab active">LOGIN</button>
+        <button id="signupTab" class="auth-tab">CREATE ACCOUNT</button>
+      </div>
+
+      <form id="authForm">
+        <label for="username">CODENAME</label>
+        <input id="username" type="text" placeholder="Enter your username"
+          minlength="3" maxlength="18" autocomplete="username" required>
+
+        <div id="passwordLabel">
+          <label for="password">PASSWORD</label>
+        </div>
+        <input id="password" type="password" placeholder="Enter your password"
+          minlength="8" autocomplete="current-password" required>
+
+        <label id="confirmLabel" for="confirmPassword" hidden>CONFIRM PASSWORD</label>
+        <input id="confirmPassword" type="password"
+          placeholder="Confirm your password" hidden autocomplete="new-password">
+
+        <label class="remember-row">
+          <input type="checkbox" id="rememberMe" checked>
+          <span>Remember me on this device</span>
+        </label>
+
+        <button type="submit" id="authSubmit" class="primary-btn">
+          ENTER THE UNKNOWN
+        </button>
+        <p id="authMessage" class="form-message" role="status"></p>
+      </form>
+
+      <div class="auth-footer">UNAUTHORIZED ACCESS IS PROHIBITED</div>
+    </div>
+  </section>
+
+  <!-- MAIN APPLICATION -->
+  <div id="appScreen" class="app-screen" hidden>
+
+    <header class="topbar">
+      <div class="brand">UNKNOWN<span>.</span></div>
+      <div class="top-right">
+        <span class="online-dot"></span>
+        <span>NETWORK ACTIVE</span>
+        <button id="logoutBtn" class="logout-btn">LOG OUT ↗</button>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <aside class="sidebar">
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <button class="nav-btn active" data-view="dashboard">⌂ Dashboard</button>
+        <button class="nav-btn" data-view="riddles">◈ Riddle Room</button>
+        <button class="nav-btn" data-view="files">▤ Secret Files</button>
+        <button class="nav-btn" data-view="profile">◎ My Profile</button>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-label">YOUR STATUS</div>
+          <div id="sidebarUsername" class="side-user">PLAYER</div>
+          <div class="side-xp"><span id="sidebarXP">0</span> XP</div>
+          <div class="sidebar-warning">CLASSIFIED // 001</div>
+        </div>
+      </aside>
+
+      <main class="content">
+
+        <!-- DASHBOARD -->
+        <section class="view active" id="dashboardView">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">PERSONAL TERMINAL / 001</div>
+              <h2>Welcome back, <span id="welcomeName">PLAYER</span>.</h2>
+              <p class="muted">Your investigation continues.</p>
+            </div>
+            <div class="status-badge">● ACTIVE AGENT</div>
+          </div>
+
+          <div class="hero-panel">
+            <div class="hero-content">
+              <div class="eyebrow">THE UNKNOWN PROJECT</div>
+              <h2>Some secrets<br>should stay buried.</h2>
+              <p>Explore classified information, solve encrypted mysteries and uncover what nobody else can see.</p>
+              <button class="primary-btn" data-go="riddles">START INVESTIGATION →</button>
+            </div>
+            <div class="hero-symbol">?</div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">TOTAL EXPERIENCE</div>
+              <div class="stat-number" id="dashXP">0</div>
+              <div class="stat-foot">XP EARNED</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">CURRENT LEVEL</div>
+              <div class="stat-number" id="dashLevel">1</div>
+              <div class="stat-foot">AGENT RANK</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">SOLVED RIDDLES</div>
+              <div class="stat-number" id="dashSolved">0</div>
+              <div class="stat-foot">CASES COMPLETED</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">UNLOCKED FILES</div>
+              <div class="stat-number" id="dashFiles">0</div>
+              <div class="stat-foot">DOCUMENTS FOUND</div>
+            </div>
+          </div>
+
+          <div class="section-heading">
+            <h3>INVESTIGATION PROGRESS</h3>
+            <span id="progressText">0 / 12</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-fill"></div>
+          </div>
+
+          <div class="section-heading">
+            <h3>RECENT ACTIVITY</h3>
+          </div>
+          <div id="activityList" class="activity-list"></div>
+
+          <div class="terminal-panel">
+            <div class="terminal-head">UNKNOWN TERMINAL <span>●●●</span></div>
+            <p>> SYSTEM STATUS: OPERATIONAL</p>
+            <p>> INVESTIGATION: IN PROGRESS</p>
+            <p>> YOUR NEXT MOVE IS YOURS.</p>
+            <p class="terminal-cursor">_</p>
+          </div>
+        </section>
+
+        <!-- RIDDLES -->
+        <section class="view" id="riddlesView">
+          <div class="eyebrow">INTELLIGENCE DEPARTMENT / 002</div>
+          <h2>Riddle Room<span class="red">.</span></h2>
+          <p class="muted">Every answer brings you closer to the truth.</p>
+
+          <div class="filter-row">
+            <select id="difficultyFilter">
+              <option value="All">ALL DIFFICULTIES</option>
+              <option value="Easy">EASY</option>
+              <option value="Medium">MEDIUM</option>
+              <option value="Hard">HARD</option>
+              <option value="Insane">INSANE</option>
+            </select>
+            <span id="riddleCount" class="muted">12 CASES</span>
+          </div>
+
+          <div id="riddleGrid" class="riddle-grid"></div>
+
+          <div id="riddlePanel" class="riddle-panel" hidden>
+            <button id="closeRiddle" class="close-btn">✕ CLOSE</button>
+            <div id="riddleDifficulty" class="eyebrow">EASY CASE</div>
+            <div id="riddleNumber" class="muted">CASE 001</div>
+            <h3 id="riddleQuestion">Question goes here</h3>
+
+            <form id="answerForm">
+              <input id="riddleAnswer" type="text"
+                placeholder="Type your answer..." autocomplete="off" required>
+              <button class="primary-btn" type="submit">SUBMIT ANSWER →</button>
+            </form>
+
+            <button id="hintBtn" class="secondary-btn">REVEAL HINT (-15 XP)</button>
+            <p id="hintText" class="hint-text"></p>
+            <p id="answerMessage" class="form-message"></p>
+          </div>
+        </section>
+
+        <!-- SECRET FILES -->
+        <section class="view" id="filesView">
+          <div class="eyebrow">RESTRICTED DATABASE / 003</div>
+          <h2>Secret Files<span class="red">.</span></h2>
+          <p class="muted">Some documents are classified for a reason.</p>
+
+          <div id="filesGrid" class="files-grid"></div>
+
+          <div class="terminal-panel code-panel">
+            <div class="terminal-head">CLASSIFIED ACCESS TERMINAL</div>
+            <p>> HAVE YOU FOUND A SECRET ACCESS CODE?</p>
+            <form id="secretCodeForm">
+              <input id="secretCode" placeholder="ENTER SECRET CODE"
+                maxlength="30" autocomplete="off">
+              <button class="primary-btn">UNLOCK</button>
+            </form>
+            <p id="secretMessage" class="form-message"></p>
+          </div>
+        </section>
+
+        <!-- PROFILE -->
+        <section class="view" id="profileView">
+          <div class="eyebrow">AGENT INFORMATION / 004</div>
+          <h2>My Profile<span class="red">.</span></h2>
+
+          <div class="profile-card">
+            <div class="avatar" id="profileAvatar">U</div>
+            <h3 id="profileName">PLAYER</h3>
+            <p class="muted">UNKNOWN NETWORK AGENT</p>
+            <div class="profile-level">LEVEL <span id="profileLevel">1</span></div>
+
+            <div class="profile-stats">
+              <div><strong id="profileXP">0</strong><span>TOTAL XP</span></div>
+              <div><strong id="profileSolved">0</strong><span>SOLVED</span></div>
+              <div><strong id="profileFiles">0</strong><span>FILES</span></div>
+            </div>
+
+            <div class="section-heading">
+              <h3>LEVEL PROGRESS</h3>
+              <span id="profileProgressText">0 / 100 XP</span>
+            </div>
+            <div class="progress-track">
+              <div id="profileProgress" class="progress-fill"></div>
+            </div>
+
+            <p class="profile-note">Your progress is saved locally on this browser.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
